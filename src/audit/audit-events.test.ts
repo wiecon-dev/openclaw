@@ -14,7 +14,11 @@ import {
 } from "../state/openclaw-state-db.js";
 import { createAgentEventAuditRecorder } from "./agent-event-audit.js";
 import { listAuditEvents, pruneExpiredAuditEvents, recordAuditEvent } from "./audit-event-store.js";
-import type { AuditEventInput, ToolActionAuditEventInput } from "./audit-event-types.js";
+import type {
+  AuditEventInput,
+  SkillSelectionAuditEventInput,
+  ToolActionAuditEventInput,
+} from "./audit-event-types.js";
 import type { AuditEventWriter } from "./audit-event-writer.js";
 
 const tempDirs: string[] = [];
@@ -51,15 +55,31 @@ function auditInput(overrides: Partial<AuditEventInput> = {}): AuditEventInput {
   } as AuditEventInput;
 }
 
-function skillSelectionInput(overrides: Partial<AuditEventInput> = {}): AuditEventInput {
-  return auditInput({
+function skillSelectionInput(
+  overrides: Partial<SkillSelectionAuditEventInput> = {},
+): SkillSelectionAuditEventInput {
+  const input: SkillSelectionAuditEventInput = {
+    sourceId: "skill-selection:2",
     sourceSequence: 2,
+    occurredAt: Date.now(),
     kind: "skill_selection",
     action: "skill.selection.observed",
     status: "observed",
+    actorType: "agent",
+    actorId: "main",
+    agentId: "main",
+    sessionKey: "agent:main:main",
+    sessionId: "session-1",
+    runId: "run-1",
     toolName: "debug-toolkit",
     ...overrides,
-  });
+  };
+  return {
+    ...input,
+    sourceId:
+      overrides.sourceId ??
+      `${input.runId}:${input.sourceSequence}:${input.occurredAt}:${input.action}`,
+  };
 }
 
 function agentEvent(overrides: Partial<AgentEventPayload>): AgentEventPayload {

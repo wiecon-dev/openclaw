@@ -19,7 +19,7 @@ export function corruptAuditRow(row: AuditRow, problem: string): never {
   throw new Error(`corrupt audit event row${location}: ${problem}`);
 }
 
-export function requiredInteger(
+function requiredInteger(
   row: AuditRow,
   value: number | bigint | null,
   field: string,

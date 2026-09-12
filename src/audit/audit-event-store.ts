@@ -627,16 +627,14 @@ export function listAuditEvents(params: {
           limit: params.limit + 1,
         })
       : [];
-  const mergedEvents = [...auditEvents, ...skillEvents].sort((left, right) => {
+  const mergedEvents = [...auditEvents, ...skillEvents].toSorted((left, right) => {
     if (right.sequence !== left.sequence) {
       return right.sequence - left.sequence;
     }
     return right.occurredAt - left.occurredAt;
   });
   const hasMore = mergedEvents.length > params.limit;
-  const events = (
-    hasMore ? mergedEvents.slice(0, params.limit) : mergedEvents
-  ) as AuditEventRecord[];
+  const events: AuditEventRecord[] = hasMore ? mergedEvents.slice(0, params.limit) : mergedEvents;
   return {
     events,
     ...(hasMore && events.length > 0 ? { nextCursor: events[events.length - 1]?.sequence } : {}),
